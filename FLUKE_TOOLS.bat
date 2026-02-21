@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 :: --- [ CONFIGURATION ] ---
-set "current_ver=0.1"
+set "current_ver=0.2"
 :: ลิงก์ที่ถูกต้อง (ตรวจสอบแล้ว)
 set "url_ver=https://raw.githubusercontent.com/manut0317z/bankkok/main/version.txt"
 set "url_script=https://raw.githubusercontent.com/manut0317z/bankkok/main/FLUKE_TOOLS.bat"
