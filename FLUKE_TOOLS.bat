@@ -5,7 +5,7 @@ setlocal enabledelayedexpansion
 set "current_ver=0.1"
 :: วางลิงก์ Raw GitHub ของไฟล์ version.txt และไฟล์ตัวโปรแกรม (.bat)
 set "url_ver=https://raw.githubusercontent.com/manut0317z/bankkok/refs/heads/main/version.txt"
-set "url_script=https://raw.githubusercontent.com/YOUR_USER/YOUR_REPO/main/FLUKE_TOOLS.bat"
+set "url_script=https://github.com/manut0317z/bankkok/blob/main/FLUKE_TOOLS.bat"
 :: ---------------------------------------
 
 :: --- ส่วนขอสิทธิ์ Administrator อัตโนมัติ ---
