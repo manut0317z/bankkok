@@ -1,51 +1,63 @@
 @echo off
 setlocal enabledelayedexpansion
 
-:: --- [ CONFIGURATION: ตั้งค่าตรงนี้ ] ---
+:: --- [ CONFIGURATION ] ---
 set "current_ver=0.1"
-:: วางลิงก์ Raw GitHub ของไฟล์ version.txt และไฟล์ตัวโปรแกรม (.bat)
-set "url_ver=https://raw.githubusercontent.com/manut0317z/bankkok/refs/heads/main/version.txt"
-set "url_script=https://github.com/manut0317z/bankkok/blob/main/FLUKE_TOOLS.bat"
-:: ---------------------------------------
+:: ลิงก์ที่ถูกต้อง (ตรวจสอบแล้ว)
+set "url_ver=https://raw.githubusercontent.com/manut0317z/bankkok/main/version.txt"
+set "url_script=https://raw.githubusercontent.com/manut0317z/bankkok/main/FLUKE_TOOLS.bat"
+:: -------------------------
 
-:: --- ส่วนขอสิทธิ์ Administrator อัตโนมัติ ---
+:: --- ส่วนขอสิทธิ์ Administrator ---
 net session >nul 2>&1
-if %errorLevel% == 0 (
-    goto :check_update
-) else (
+if %errorLevel% neq 0 (
     powershell -Command "Start-Process '%~f0' -Verb RunAs"
     exit
 )
 
 :check_update
-title Checking for updates...
-echo Checking for updates, please wait...
+cls
+title FLUKE SUPER TOOLS - Checking Update...
+echo  [ STATUS ] : Connecting to Server...
 
-:: ใช้ PowerShell ดึงเลขเวอร์ชันล่าสุดมาเทียบ
-for /f "delims=" %%a in ('powershell -Command "$ProgressPreference = 'SilentlyContinue'; try { (New-Object Net.WebClient).DownloadString('%url_ver%').Trim() } catch { $null }"') do set "latest_ver=%%a"
+:: 1. เช็คว่าเชื่อมต่ออินเทอร์เน็ตได้ไหม
+ping -n 1 google.com >nul 2>&1
+if %errorLevel% neq 0 (
+    echo  [ WARN   ] : No Internet Connection.
+    timeout /t 2 >nul
+    goto admin_ok
+)
 
-:: ถ้าดึงเวอร์ชันได้ และไม่ตรงกับปัจจุบัน
-if defined latest_ver (
-    if "%latest_ver%" neq "%current_ver%" (
+:: 2. ดึงค่าเวอร์ชัน (เพิ่มการจัดการค่าว่าง)
+for /f "delims=" %%a in ('powershell -Command "$ProgressPreference = 'SilentlyContinue'; try { $v = (New-Object Net.WebClient).DownloadString('%url_ver%').Trim(); if($v) { echo $v } else { echo 'error' } } catch { echo 'error' }"') do set "latest_ver=%%a"
+
+:: 3. ตรวจสอบเงื่อนไข
+if "%latest_ver%"=="error" (
+    echo  [ ERROR  ] : GitHub Link is invalid or 404.
+    timeout /t 2 >nul
+    goto admin_ok
+)
+
+if "%latest_ver%" neq "%current_ver%" (
+    echo.
+    echo    ==================================================
+    echo      [ UPDATE FOUND ] : New Version v%latest_ver%
+    echo    ==================================================
+    echo.
+    set /p choice=    Do you want to update now? (Y/N): 
+    if /i "!choice!"=="Y" (
         echo.
-        echo ==================================================
-        echo   FOUND NEW VERSION: v%latest_ver% (Current: v%current_ver%)
-        echo ==================================================
-        set /p choice= Do you want to update now? (Y/N): 
-        if /i "!choice!"=="Y" (
-            echo Updating...
-            powershell -Command "(New-Object Net.WebClient).DownloadFile('%url_script%', '%~f0')"
-            echo Update Complete! Restarting...
-            timeout /t 2 >nul
-            start "" "%~f0"
-            exit
-        )
+        echo    [ UPDATING ] : Downloading...
+        powershell -Command "(New-Object Net.WebClient).DownloadFile('%url_script%', '%~f0')"
+        echo    [ SUCCESS  ] : File Updated.
+        timeout /t 1 >nul
+        start "" "%~f0"
+        exit
     )
 )
-goto :admin_ok
 
 :admin_ok
-:: --- ตั้งค่าภาษาและสี (ระบบเดิมของคุณ) ---
+:: --- ส่วนเมนูหลัก (ระบบเดิมของคุณ) ---
 chcp 874 >nul
 title FLUKE SUPER TOOLS v%current_ver%
 color 9
@@ -55,7 +67,7 @@ cls
 echo.
 echo    ==================================================
 echo             FLUKE SYSTEM TOOLS (PROGRESS)
-echo             VERSION: %current_ver%
+echo             Current Version: %current_ver%
 echo    ==================================================
 echo.
 echo     [1] CLEAN  : ล้างขยะเครื่อง (%%temp%%)
@@ -78,55 +90,33 @@ goto menu
 :clean
 cls
 echo.
-echo    [ กำลังเริ่มกระบวนการล้างขยะ... ]
-echo    --------------------------------------------------
-echo.
-powershell -Command "for($i=0; $i -le 100; $i+=10) { Write-Progress -Activity 'กำลังทำความสะอาดระบบ' -Status \"$i%% เสร็จสิ้น\" -PercentComplete $i; Start-Sleep -Milliseconds 200 }"
-
+echo    [ กำลังล้างขยะ... ]
+powershell -Command "for($i=0; $i -le 100; $i+=20) { Write-Progress -Activity 'Cleaning' -Status \"$i%%\" -PercentComplete $i; Start-Sleep -Milliseconds 100 }"
 del /s /f /q %temp%\*.* >nul 2>&1
 for /d %%p in ("%temp%\*") do rd /s /q "%%p" >nul 2>&1
-del /s /f /q C:\Windows\Temp\*.* >nul 2>&1
-for /d %%p in ("C:\Windows\Temp\*") do rd /s /q "%%p" >nul 2>&1
 powershell -Command "Clear-RecycleBin -Confirm:$false" >nul 2>&1
-
-echo.
-echo    ? [100%%] ล้างไฟล์ขยะและถังขยะเรียบร้อยแล้ว!
-echo    --------------------------------------------------
+echo DONE!
 pause
 goto menu
 
 :disable_def
 cls
-echo.
-echo    [ กำลังปิดการป้องกัน... ]
-powershell -Command "Write-Progress -Activity 'Changing Status' -Status 'Disabling...' -PercentComplete 50"
 powershell -Command "Set-MpPreference -DisableRealtimeMonitoring $true"
-echo.
-echo    DONE: ปิดการสแกนไวรัสชั่วคราวแล้ว
+echo Defender Disabled.
 pause
 goto menu
 
 :enable_def
 cls
-echo.
-echo    [ กำลังเปิดการป้องกัน... ]
-powershell -Command "Write-Progress -Activity 'Changing Status' -Status 'Enabling...' -PercentComplete 50"
 powershell -Command "Set-MpPreference -DisableRealtimeMonitoring $false"
-echo.
-echo    DONE: ระบบป้องกันกลับมาทำงานปกติ
+echo Defender Enabled.
 pause
 goto menu
 
 :add_exclude
 cls
-echo.
-echo    [ ADD EXCLUSION PATH ]
-echo    --------------------------------------------------
-set /p folderpath=    PATH: 
-powershell -Command "Write-Progress -Activity 'Adding Path' -Status 'Processing...' -PercentComplete 50"
+set /p folderpath= Enter Path: 
 powershell -Command "Add-MpPreference -ExclusionPath '%folderpath%'"
-echo.
-echo    SUCCESS: เพิ่มการยกเว้นเรียบร้อย!
-echo    --------------------------------------------------
+echo Added Exclusion.
 pause
 goto menu
