@@ -1,6 +1,6 @@
 @echo off
 setlocal
-title FLUKE SUPER TOOLS v0.2.6
+title FLUKE SUPER TOOLS v0.0.2
 mode con cols=60 lines=3
 
 :: [1] ขอกลางสิทธิ์ Administrator
