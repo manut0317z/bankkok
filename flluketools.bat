@@ -13,7 +13,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
     "$u = [System.Text.Encoding]::GetEncoding(874); " ^
     "$m1 = $u.GetString(@(0x20,0x0E,0x32,0x0E,0x32,0x0E,0x07,0x0E,0x31,0x0E,0x42,0x0E,0x30,0x0E,0x1A,0x0E,0x48,0x0E,0x1A,0x0E,0x1A,0x0E,0x23,0x0E,0x31,0x0E,0x22,0x0E,0x1A,0x0E)); " ^
     "Add-Type -AssemblyName System.Windows.Forms; Add-Type -AssemblyName System.Drawing; " ^
-    "$f = New-Object Windows.Forms.Form; $f.Text = 'FLUKE SUPER TOOLS v0.0.2'; $f.Size = '380,500'; " ^
+    "$f = New-Object Windows.Forms.Form; $f.Text = 'FLUKE SUPER TOOLS v0.0.3'; $f.Size = '380,500'; " ^
     "$f.StartPosition = 'CenterScreen'; $f.BackColor = '#0F0F0F'; $f.TopMost = $true; $f.FormBorderStyle = 'FixedDialog'; " ^
     "$fontTitle = New-Object Drawing.Font('Impact', 22); $fontBtn = New-Object Drawing.Font('Tahoma', 10, [Drawing.FontStyle]::Bold); " ^
     "$title = New-Object Windows.Forms.Label; $title.Text = 'SYSTEM CONTROL'; $title.ForeColor = 'DeepSkyBlue'; " ^
