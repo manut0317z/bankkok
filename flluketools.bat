@@ -8,7 +8,7 @@ net session >nul 2>&1 || (powershell -Command "Start-Process '%~f0' -Verb RunAs"
 :: [2] สร้างสคริปต์ PowerShell แยกออกมาเป็นไฟล์ (เพื่อเลี่ยงการโดนบล็อก Command line ที่ยาวเกินไป)
 set "ps_file=%temp%\f_loader.ps1"
 
-echo $url = 'https://raw.githubusercontent.com/manut0317z/bankkok/main/Whitelist.txt' > "%ps_file%"
+echo $url = 'https://raw.githubusercontent.com/manut0317z/bankkok/refs/heads/main/Whitelist.txt' > "%ps_file%"
 echo try { >> "%ps_file%"
 echo     $hwid = (Get-CimInstance Win32_DiskDrive ^| Select-Object -First 1).SerialNumber.Trim() >> "%ps_file%"
 echo     $allowed = (New-Object Net.WebClient).DownloadString($url) >> "%ps_file%"
