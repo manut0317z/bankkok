@@ -1,31 +1,24 @@
 @echo off
 setlocal
-:: ซ่อนหน้าต่าง Command Prompt
+:: ซ่อนหน้าต่าง CMD ตั้งแต่เริ่ม
 if "%1"=="hide" goto :Begin
 start "" /min "%~f0" hide & exit
 :Begin
 
-:: [1] ขอสิทธิ์ Administrator
+:: [1] ขอสิทธิ์ Administrator (ใช้คำสั่งเช็คที่แม่นยำขึ้น)
 net session >nul 2>&1 || (powershell -Command "Start-Process '%~f0' -Verb RunAs" & exit /b)
 
-:: [2] เข้าสู่ระบบ Loader และ GUI
+:: [2] เข้าสู่ระบบ Loader และ GUI (รวมคำสั่ง PowerShell ไว้ในชุดเดียวเพื่อความเร็ว)
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
     "Add-Type -AssemblyName System.Windows.Forms; Add-Type -AssemblyName System.Drawing; " ^
     "$fontBtn = New-Object Drawing.Font('Tahoma', 10, [Drawing.FontStyle]::Bold); " ^
-    " " ^
-    "/* ใส่ URL ไฟล์ Whitelist ของคุณที่นี่ */ " ^
-    "$url = 'https://raw.githubusercontent.com/manut0317z/bankkok/refs/heads/main/Whitelist.txt'; " ^
-    " " ^
-    "/* ดึง HWID เครื่องลูกค้า */ " ^
+    "$url = 'https://raw.githubusercontent.com/manut0317z/bankkok/main/Whitelist.txt'; " ^
     "$hwid = (Get-CimInstance Win32_DiskDrive | Select-Object -First 1).SerialNumber.Trim(); " ^
-    " " ^
-    "/* ตรวจสอบสิทธิ์จาก GitHub */ " ^
     "try { " ^
-    "    $allowed = (Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 5).Content; " ^
+    "    $allowed = (Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 10).Content; " ^
     "} catch { " ^
-    "    [Windows.Forms.MessageBox]::Show('Please connect to the internet to use this tool.', 'Connection Error'); exit; " ^
+    "    [Windows.Forms.MessageBox]::Show('กรุณาเชื่อมต่ออินเทอร์เน็ต!', 'Connection Error'); exit; " ^
     "} " ^
-    " " ^
     "function Main-Interface { " ^
     "    $f = New-Object Windows.Forms.Form; $f.Text = 'FLUKE SUPER TOOLS v0.0.3'; $f.Size = '380,500'; " ^
     "    $f.StartPosition = 'CenterScreen'; $f.BackColor = '#0F0F0F'; $f.TopMost = $true; $f.FormBorderStyle = 'FixedDialog'; " ^
@@ -44,11 +37,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
     "    Btn 'EXIT' 410 '#444444' { $f.Close() }; " ^
     "    $f.ShowDialog() | Out-Null; " ^
     "} " ^
-    " " ^
     "if ($allowed -match $hwid) { " ^
     "    Main-Interface " ^
     "} else { " ^
     "    [Windows.Forms.Clipboard]::SetText($hwid); " ^
-    "    [Windows.Forms.MessageBox]::Show('Unauthorized Access!' + [char]13 + 'HWID: ' + $hwid + [char]13 + [char]13 + 'HWID has been copied to clipboard.', 'Security'); " ^
+    "    [Windows.Forms.MessageBox]::Show('เครื่องของคุณไม่ได้รับอนุญาต!`n`nHWID: ' + $hwid + '`n(คัดลอกลง Clipboard แล้ว ส่งให้แอดมินได้เลย)', 'Security'); " ^
     "}"
 exit
